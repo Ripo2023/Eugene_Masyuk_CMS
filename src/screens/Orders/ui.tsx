@@ -14,11 +14,19 @@ import { IOrder, getAllOrders } from "../../entities/user";
 import { Loader, Text } from "../../shared/ui";
 import { OrderModal } from "../../widgets/order-modal";
 import { useLoadData } from "../../shared/lib";
+import Map from "../../shared/assets/icons/MapPin.svg";
+import Logo from "../../shared/assets/icons/logo.svg";
+import { MapModal } from "../../widgets/map-modal/ui";
 
 export const OrdersScreen: React.FC = () => {
 	const [orders, setOrders] = React.useState<Nullable<IOrder[]>>(null);
 	const activeOrderRef = useRef<Nullable<IOrder>>(null);
 	const [isOpenModal, setIsOpenModal] = useState(false);
+	const [isOpenMap, setIsOpenMap] = useState(false);
+
+	const handleToggleMapModal = () => {
+		setIsOpenMap(!isOpenMap);
+	};
 
 	const handleToggleModal = () => {
 		setIsOpenModal(!isOpenModal);
@@ -44,7 +52,20 @@ export const OrdersScreen: React.FC = () => {
 	};
 
 	const headerComponent = () => {
-		return <Title size={Spacer.EXTRA_LARGE}>In progress</Title>;
+		return (
+			<HeaderWrapper>
+				<Title size={Spacer.EXTRA_LARGE}>Orders List</Title>
+				<LogoWrapper onPress={handleToggleMapModal}>
+					<Logo />
+					<LogoInfo>
+						<LogoName color="#636466">Coffee shop address</LogoName>
+						<LogoAddress>
+							<Map /> 43, Marathon st.
+						</LogoAddress>
+					</LogoInfo>
+				</LogoWrapper>
+			</HeaderWrapper>
+		);
 	};
 
 	const { isLoading } = useLoadData({ loadData: handleLoadData });
@@ -89,6 +110,12 @@ export const OrdersScreen: React.FC = () => {
 					data={activeOrderRef.current}
 				/>
 			)}
+			{isOpenMap && (
+				<MapModal
+					isVisible={isOpenMap}
+					handleCloseModal={handleToggleMapModal}
+				/>
+			)}
 		</Wrapper>
 	);
 };
@@ -100,7 +127,7 @@ const Wrapper = styled.View`
 
 const OrderWrapper = styled.TouchableOpacity`
 	width: 100%;
-	height: 40px;
+	height: 100px;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
@@ -111,18 +138,41 @@ const OrderWrapper = styled.TouchableOpacity`
 `;
 
 const OrderImage = styled(FastImage)`
-	width: 20px;
-	height: 20px;
+	width: 80px;
+	height: 80px;
 	background: ${WHITE_COLOR};
-
 	border-color: ${ORANGE_COLOR};
 	border-width: 1px;
 	border-radius: 10px;
 `;
 
 const Title = styled(Text)`
-	margin-bottom: ${Spacer.MEDIUM}px;
 	margin-top: ${Spacer.EXTRA_LARGE}px;
 `;
 
 const EmptyWrapper = styled.View``;
+
+const HeaderWrapper = styled.View`
+	margin-bottom: ${Spacer.MEDIUM}px;
+`;
+
+const LogoWrapper = styled.Pressable`
+	flex-direction: row;
+	margin: ${Spacer.LARGE}px ${Spacer.MEDIUM}px;
+	background: white;
+`;
+
+const LogoInfo = styled.View`
+	margin-left: ${Spacer.MEDIUM}px;
+`;
+
+const LogoAddress = styled(Text)`
+	flex-direction: row;
+	align-items: center;
+	color: #2a2a2b;
+	font-weight: 500;
+`;
+
+const LogoName = styled(Text)`
+	margin-bottom: 3px;
+`;
